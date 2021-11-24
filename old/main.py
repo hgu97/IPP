@@ -141,10 +141,9 @@ for i in range(len(og_largestcnt)):
         robot.setSpeed(60,-1,-1,-1)
         
     # Calculate the new position around the reference:
-    x = (int(og_largestcnt[i,:,1])-40)/1.8+789.7+40  # new X coordinate
-    y = (int(og_largestcnt[i,:,0])-47)/2.3-62.3+47  # new Y coordinate
-
-    z = 500      # new Z coordinate
+    x = int(og_largestcnt[i,:,1])+825.3  # new X coordinate
+    y = int(og_largestcnt[i,:,0])-55.9  # new Y coordinate
+    z = 600      # new Z coordinate
     target_pose.setPos([x,y,z])
 
     print(x, y, z)
@@ -155,6 +154,6 @@ for i in range(len(og_largestcnt)):
 # Trigger a program call at the end of the movement
 
 # Move back to the reference target:
-robot.setSpeed(60,5,-1,-1)
+robot.setSpeed(30,5,-1,-1)
 robot.MoveL(target)
 robot.MoveL(Home)

@@ -5,18 +5,6 @@ from robodk import *
 from robolink import *
 from pypylon import pylon
 
-# img = pylon.PylonImage()
-# tlf = pylon.TlFactory.GetInstance()
-
-# cam = pylon.InstantCamera(tlf.CreateFirstDevice())
-# cam.Open()
-# cam.StartGrabbing()
-
-# img.Release()
-# cam.StopGrabbing()
-# cam.Close()
-# camera_img = img
- 
 #%% img read()
 # og_color = cv.imread('D:/Python_code/OG.jpg')    #('D:/Python_code/135m_OG6.jpg')             
 # burr_color = cv.imread('D:/Python_code/BURR_Rot&Trans.jpg')#('D:/Python_code/135m_BURR6.jpg')
@@ -28,25 +16,18 @@ og_color = cv.imread('C:/Users/GL-NT/opencv/test_o.bmp')
 burr_color = cv.imread('C:/Users/GL-NT/opencv/test.bmp') 
 
 
-#%% img resize
-og_width = 800         
-og_height = 600 
-og_color = cv.resize(og_color, (og_width,og_height),interpolation = cv.INTER_AREA)
-burr_color = cv.resize(burr_color, (og_width,og_height), interpolation = cv.INTER_AREA)
 og = cv.cvtColor(og_color, cv.COLOR_BGR2GRAY)
 burr = cv.cvtColor(burr_color, cv.COLOR_BGR2GRAY)
 
 
 #%% 이미지 trim
-og_upper, og_lower, og_left, og_right = deburr.imtrim(og,n=1,offset=40)
+og_upper, og_lower, og_left, og_right = deburr.imtrim(og,n=1,offset=100)
 
 og_trim = og_color[og_upper:og_lower, og_left:og_right]
 og_trim_g = og[og_upper:og_lower, og_left:og_right]
 trim_og = og_trim.copy()
-
-
-#%% Template matching
-# cv.imshow('a',og_trim)
+test_og= og_trim.copy()
+       
 burr_left, burr_upper, burr_right, burr_lower = deburr.TempMatch(og_trim_g,burr)
 
 burr_trim = burr_color[burr_upper:burr_lower,burr_left:burr_right]
@@ -87,27 +68,21 @@ rot_largestcnt,_ = deburr.contour(img_rot_g)
 og_largestcnt,_ = deburr.contour(og_trim_g)
         
 test_bg = np.zeros(og_trim.shape,dtype=np.uint8) 
+o = test_bg.copy()
+b = test_bg.copy()
 
 # cv.drawContours(og_trim, og_largestcnt, -1, (255,0,0), 1)    
 # cv.drawContours(og_trim, rot_largestcnt, -1, (0,0,255), 1)  
     
 cv.drawContours(test_bg, og_largestcnt, -1, (255,0,0), 1)    
-cv.drawContours(test_bg, rot_largestcnt, -1, (0,0,255), 1)  
+cv.drawContours(test_bg, rot_largestcnt, -1, (0,255,255), 1)  
+cv.drawContours(o, og_largestcnt, -1, (255,0,0), 1)    
+cv.drawContours(b, rot_largestcnt, -1, (0,255,255), 1)  
    
-cv.drawContours(trim_og, rot_largestcnt, -1, (0,255,0), 1)
+cv.drawContours(trim_og, og_largestcnt, -1, (0,255,0), 1)
 
 #%% burr size
-tool_feed = deburr.burr_size(og_largestcnt,rot_largestcnt, trim_og)
-  
-
-# 결과 출력                    
-# cv.imshow('test_bg', test_bg)
-# cv.imshow('trim_og',trim_og)
-# cv.imshow('og_color', og_color)
-# cv.imshow('burr_color', burr_color)
-
-# cv.waitKey()
-# cv.destroyAllWindows()
+tool_feed = deburr.burr_size(og_largestcnt,rot_largestcnt, test_bg)
 
 # Start the RoboDK API:
 RDK = Robolink()
@@ -141,10 +116,10 @@ for i in range(len(og_largestcnt)):
         robot.setSpeed(60,-1,-1,-1)
         
     # Calculate the new position around the reference:
-    x = (int(og_largestcnt[i,:,1])-40)/1.8+789.7+40  # new X coordinate
-    y = (int(og_largestcnt[i,:,0])-47)/2.3-62.3+47  # new Y coordinate
-
+    x = (float(og_largestcnt[i,:,1])-334)/5.34+870.5 # new X coordinate
+    y = (float(og_largestcnt[i,:,0])-291)/5.3+11.9  # new Y coordinate
     z = 500      # new Z coordinate
+    
     target_pose.setPos([x,y,z])
 
     print(x, y, z)
@@ -155,6 +130,6 @@ for i in range(len(og_largestcnt)):
 # Trigger a program call at the end of the movement
 
 # Move back to the reference target:
-robot.setSpeed(60,5,-1,-1)
+robot.setSpeed(30,5,-1,-1)
 robot.MoveL(target)
 robot.MoveL(Home)

@@ -37,7 +37,7 @@ def Align(src_pts,dst_pts,matchesMask):
     theta = np.arcsin(v)
     theta = theta.mean() *180/math.pi
     
-    Matrix = cv.getRotationMatrix2D((dst.mean(axis=0)[0],dst.mean(axis=0)[1]),theta,1)
+    Matrix = cv.getRotationMatrix2D((dst.mean(axis=0)[0],dst.mean(axis=0)[1]),theta,0.5)
     Matrix[0][2] = Matrix[0][2] -dx
     Matrix[1][2] = Matrix[1][2] -dy
     return Matrix
