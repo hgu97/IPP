@@ -135,10 +135,9 @@ for i in range(len(og_largestcnt)):
         robot.setSpeed(30,-1,-1,-1)
     elif tool_feed[i]>=3:
         robot.setSpeed(30,-1,-1,-1)
-    elif tool_feed[i]>=2:
+    else :
         robot.setSpeed(60,-1,-1,-1)
-    elif tool_feed[i]>=1:
-        robot.setSpeed(60,-1,-1,-1)
+    
         
     # Calculate the new position around the reference:
     x = (int(og_largestcnt[i,:,1])-40)/1.8+789.7+40  # new X coordinate
